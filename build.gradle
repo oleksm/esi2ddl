@@ -1,0 +1,57 @@
+plugins {
+    id 'java'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.21'
+}
+
+
+group 'oleks-eveonline'
+version '1.0-SNAPSHOT'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+configurations {
+    compile {
+        transitive = false
+    }
+}
+
+dependencies {
+    def excluded = {
+        exclude group: 'xerces', module: 'xercesImpl'
+    }
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8", excluded
+    compile  group: 'commons-cli', name: 'commons-cli', version: '1.4', excluded
+    compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0', excluded
+    compile group: 'org.apache.ddlutils', name: 'ddlutils', version: '1.0', excluded
+    compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.6.0', excluded
+    runtime group: 'org.postgresql', name: 'postgresql', version: '42.2.6'
+
+    testCompile group: 'junit', name: 'junit', version: '4.12'
+}
+
+task copyToLib(type: Copy) {
+    into "$buildDir/libs/lib"
+    from configurations.runtime
+}
+
+build.dependsOn(copyToLib)
+
+compileKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+compileTestKotlin {
+    kotlinOptions.jvmTarget = "1.8"
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": "tech.oleks.eveonline.esi2ddl.MainKt"
+        attributes "Class-Path": configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
+    }
+}
+
+
+
