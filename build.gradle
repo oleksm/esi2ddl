@@ -23,7 +23,7 @@ dependencies {
         exclude group: 'xerces', module: 'xercesImpl'
     }
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8", excluded
-    compile  group: 'commons-cli', name: 'commons-cli', version: '1.4', excluded
+    compile group: 'commons-cli', name: 'commons-cli', version: '1.4', excluded
     compile group: 'com.jayway.jsonpath', name: 'json-path', version: '2.4.0', excluded
     compile group: 'org.apache.ddlutils', name: 'ddlutils', version: '1.0', excluded
     compile group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.6.0', excluded

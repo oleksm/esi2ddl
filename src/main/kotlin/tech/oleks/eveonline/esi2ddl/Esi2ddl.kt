@@ -44,6 +44,7 @@ class Esi2ddl(val swagger: String,
             }
         println("step1ParseSwagger: ${TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS)}ms")
     }
+
     // A creature from hell starts here
     private fun step2BuildEsiTableModel() {
         val start = System.nanoTime()
@@ -68,7 +69,7 @@ class Esi2ddl(val swagger: String,
             jT ?: continue // nothing to fetch
             val table = Table()
             // don't ask me why (I would not remember)
-            table.name = path.replace(Regex("\\/\\{\\w+\\}\\/\\b|\\/\\{|\\}\\/|\\/"), "_").trim('_')
+            table.name = path.replace(Regex("/\\{|\\}/|/"), "_").trim('_')
             table.description = jT["description"]
             esiDatabase.addTable(table)
 
@@ -86,7 +87,7 @@ class Esi2ddl(val swagger: String,
             jsonModels.read<List<Map<String, String>>>("paths.$path.get.parameters[?(@.in == 'path')]")?.forEachIndexed { idx, jp ->
                 val name = jp["name"]
                 if (table.columns.find{it.name == name} == null) {
-                    convertSingleColumn(name!!, jp, true, table)
+                    convertSingleColumn(name!!, jp, true, table, idx)
                 }
             }
         }
@@ -132,7 +133,7 @@ class Esi2ddl(val swagger: String,
         }
     }
 
-    private fun convertSingleColumn(name: String, jCol: Map<String, Any>, required: Boolean, table: Table) {
+    private fun convertSingleColumn(name: String, jCol: Map<String, Any>, required: Boolean, table: Table, idx: Int = table.columnCount) {
         val column = Column()
         column.clone()
         column.type = toDatabaseType(jCol["type"]?.toString(), jCol["format"]?.toString())
@@ -142,7 +143,7 @@ class Esi2ddl(val swagger: String,
         column.isRequired = required
         column.isPrimaryKey = jCol["uniqueItems"] as Boolean? ?: false
         if (verbose) println("${table.name}.${column.name}, type: ${column.type}, primary: ${column.isPrimaryKey} required: ${column.isRequired}, description: ${column.description}")
-        table.addColumn(column)
+        table.addColumn(idx, column)
     }
 
     private fun to29CharString(s: String): String {

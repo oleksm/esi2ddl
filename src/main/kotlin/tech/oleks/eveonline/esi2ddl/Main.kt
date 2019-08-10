@@ -15,7 +15,7 @@ fun main(args: Array<String>) {
     opts.addOption("d", "dry-run", false, "Parses swagger but skips db step3UploadDdl")
     opts.addOption("u", "username", true, "Postgres database username (default postgres)")
     opts.addOption("p", "password", true, "Postgres database password")
-    opts.addOption("c", "connection-url", true, "Postgres database url string")
+    opts.addOption("c", "connection-url", true, "Postgres database connection url string")
     opts.addOption("s", "schema", true, "Postgres database schema (default public)")
     opts.addOption("v", "verbose", false, "Produces additional output lines")
     opts.addOption("h", "help", false, "Print command line argument help and usage")

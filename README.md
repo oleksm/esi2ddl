@@ -19,5 +19,5 @@ Generates Postgres tables from ESI swagger specification
 ```
 
 ## Command Line Example
-`java -jar ./build/libs/esi2ddl-1.0-SNAPSHOT.jar -c jdbc:postgresql://localhost/jsonschema -s esi`
+`java -jar ./build/libs/esi2ddl-1.0-SNAPSHOT.jar -c jdbc:postgresql://localhost/ESI -s public`
 
