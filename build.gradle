@@ -48,7 +48,7 @@ compileTestKotlin {
 
 jar {
     manifest {
-        attributes "Main-Class": "tech.oleks.eveonline.esi2ddl.MainKt"
+        attributes "Main-Class": "com.horizoneve.esi2ddl.esi2ddl.MainKt"
         attributes "Class-Path": configurations.runtime.files.collect { "lib/$it.name" }.join(' ')
     }
 }

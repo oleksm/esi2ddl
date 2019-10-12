@@ -1,4 +1,4 @@
-package tech.oleks.eveonline.esi2ddl
+package com.horizoneve.esi2ddl.esi2ddl
 
 import org.apache.commons.cli.DefaultParser
 import org.apache.commons.cli.HelpFormatter

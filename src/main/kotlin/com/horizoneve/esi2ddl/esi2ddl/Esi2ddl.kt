@@ -1,4 +1,4 @@
-package tech.oleks.eveonline.esi2ddl
+package com.horizoneve.esi2ddl.esi2ddl
 
 import com.jayway.jsonpath.*
 import org.apache.commons.dbcp2.BasicDataSource
@@ -7,6 +7,7 @@ import org.apache.ddlutils.model.Column
 import org.apache.ddlutils.model.Database
 import org.apache.ddlutils.model.Table
 import org.apache.ddlutils.model.TypeMap
+import java.lang.Exception
 import java.net.URL
 
 import java.lang.RuntimeException
@@ -69,7 +70,7 @@ class Esi2ddl(val swagger: String,
             jT ?: continue // nothing to fetch
             val table = Table()
             // don't ask me why (I would not remember)
-            table.name = path.replace(Regex("/\\{|\\}/|/"), "_").trim('_')
+            table.name = path2table(path)
             table.description = jT["description"]
             esiDatabase.addTable(table)
 
@@ -102,6 +103,50 @@ class Esi2ddl(val swagger: String,
         }
         esiDatabase.initialize()
         println("step2BuildEsiTableModel: ${TimeUnit.MILLISECONDS.convert(System.nanoTime() - start, TimeUnit.NANOSECONDS)}ms")
+    }
+
+    private fun path2table(path: String): String {
+        var tks = path.trim('/').split('/')
+        if (tks.size == 1) return tks[0]
+        var res = StringBuffer()
+        for (i in tks.indices) {
+            var tk = tks[i].replace("{", "").replace("}", "").replace("_id", "")
+                .replace("division", "div")
+                .replace(Regex("tes$"), "te").replace(Regex("pes$"), "pe")
+                .replace(Regex("ies$"), "y").replace(Regex("ees$"), "ee")
+                .replace(Regex("les$"), "le").replace(Regex("ces$"), "ce")
+                .replace(Regex("ons$"), "one")
+                .replace(Regex("es$"), "").replace(Regex("s$"), "")
+            if (i == 0) { // first word becomes a prefix
+                res.append(
+                    tk.replace("alliance", "alli").replace("calendar", "cal").replace(
+                        "character",
+                        "chr"
+                    ).replace("corporation", "crp").replace("dogma", "dgm").replace("fleet", "flt").replace(
+                        "incursions",
+                        "inc"
+                    ).replace("industry", "ind").replace("insurance", "ins").replace("killmail", "km").replace(
+                        "loyalty",
+                        "loy"
+                    ).replace("market", "mkt").replace("opportunity", "opp").replace(
+                        "search",
+                        "srch"
+                    ).replace("sovereignty", "sov").replace("universe", "uv").replace("contract", "ctr")
+                ).append('_')
+
+            }
+            else if (i == tks.size - 1) {// last word may indicate details
+                if (tks[i-1].contains(tk))
+                    res.append("dtl")
+                else res.append(tk)
+            }
+            else {
+                if (!tks[i-1].contains(tk)) // skip repetitions
+                    res.append(tk).append('_')
+            }
+        }
+        if (res.length > 30) throw Exception("table name > 30: ${res.toString()}, tks: $tks")
+        return res.toString()
     }
 
     private fun convertTableStructure(path: String, name: String, table: Table) {
