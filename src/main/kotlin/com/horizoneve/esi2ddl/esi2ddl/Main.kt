@@ -17,6 +17,7 @@ fun main(args: Array<String>) {
     opts.addOption("p", "password", true, "Postgres database password")
     opts.addOption("c", "connection-url", true, "Postgres database connection url string")
     opts.addOption("s", "schema", true, "Postgres database schema (default public)")
+    opts.addOption("m", "mapping", true, "Path to ESI API To Database tables mapping information file")
     opts.addOption("v", "verbose", false, "Produces additional output lines")
     opts.addOption("h", "help", false, "Print command line argument help and usage")
     lateinit var esi2ddl : Esi2ddl
@@ -43,8 +44,9 @@ fun main(args: Array<String>) {
         if (schema == null)
             schema = "public"
         var verbose = line.hasOption("verbose")
+        var mapping : String? = line.getOptionValue("mapping")
 
-        esi2ddl = Esi2ddl(swagger, url, dry, username, password, schema, verbose)
+        esi2ddl = Esi2ddl(swagger, url, dry, username, password, schema, mapping, verbose)
     }
     catch(e: ParseException) {
         argError("Error parsing command line arguments: " + e.message, opts)
@@ -60,6 +62,6 @@ fun argError(msg: String, opts: Options) {
 
 fun printUsage(opts: Options) {
     val fmt = HelpFormatter()
-    fmt.printHelp(120, "[-d] [-v] [-h] -c <connection-url> [-e <esi-swagger>] [-s <schema>] [-u <username>] [-p <password>]",
+    fmt.printHelp(120, "[-d] [-v] [-h] -c <connection-url> [-e <esi-swagger>] [-s <schema>] [-u <username>] [-p <password>] [-m <mapping>]",
         "Generates Postgres tables from ESI swagger specification", opts, System.lineSeparator(), false)
 }
